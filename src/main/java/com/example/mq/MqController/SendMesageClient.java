@@ -1,0 +1,53 @@
+package com.example.mq.MqController;
+
+import com.example.mq.po.MessageTemplate;
+import com.example.mq.po.User;
+import com.example.mq.util.FinalParmarConfig;
+import com.rabbitmq.client.ConsumerCancelledException;
+import com.rabbitmq.client.PossibleAuthenticationFailureException;
+import com.rabbitmq.client.ShutdownSignalException;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.util.concurrent.TimeoutException;
+
+@Component
+public class SendMesageClient {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public String sendMessage(MessageTemplate template) {
+     try{
+        rabbitTemplate.convertAndSend(FinalParmarConfig.DIRECTEXCHANGE,FinalParmarConfig.ROUTINGKEY_ONE, template);
+    } catch (Exception ex) {
+        if (ex instanceof AmqpException) {
+            return FinalParmarConfig.AMQP_EXCEPTION;
+        } else if (ex instanceof ShutdownSignalException) {
+            return "ShutdownSignalException";
+        } else if (ex instanceof ConnectException) {
+            return "ConnectException";
+        } else if (ex instanceof PossibleAuthenticationFailureException) {
+            return "PossibleAuthenticationFailureException";
+        } else if (ex instanceof UnsupportedEncodingException) {
+            return "UnsupportedEncodingException";
+        } else if (ex instanceof IOException) {
+            return "IOException";
+        } else if (ex instanceof TimeoutException) {
+            return "TimeoutException";
+        } else if (ex instanceof ConsumerCancelledException) {
+            return "ConsumerCancelledException";
+        } else if (ex instanceof org.springframework.amqp.rabbit.support.ConsumerCancelledException) {
+            return "ConsumerCancelledException";
+        } else {
+            return "fail";
+        }
+    }
+        return "SendSuccess";
+    }
+}

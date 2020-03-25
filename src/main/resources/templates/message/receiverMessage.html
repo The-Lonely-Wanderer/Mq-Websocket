@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>接收消息</title>
+</head>
+<body>
+    <div id="receiverDiv"></div>
+    <button id="reveiverButton" >接收消息</button>
+</body>
+<script type="text/javascript" src="../../static/js/jQ/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    var ws = null;
+    var wsUrl = "ws://localhost:8081/MqDemo/websocket/";
+
+    if('WebSocket' in window){
+        ws = new WebSocket(wsUrl);
+    }else{
+        alert("当前浏览器不支持WebScoket");
+    }
+    /**
+     *  连接服务器
+     * */
+    ws.onopen=function(){
+        setMessage("连接成功");
+    };
+    /**
+     * 收到消息
+     * @param event
+     */
+    ws.onmessage=function (event) {
+        setMessage(event.data);
+    };
+    /**
+     *  错误
+     * */
+    ws.onerror=function (event) {
+        setMessage("发生错误"+event)
+    }
+    ws.onclose=function () {
+        setMessage("离开了！")
+    }
+    function setMessage(msg) {
+        $("#receiverDiv").text(msg);
+    }
+</script>
+</html>

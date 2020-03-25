@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://wwww.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆</title>
+    <link type="text/css" rel="stylesheet" th:href="@{static/plugins/bootstrap-3.3.7-dist/css/bootstrap.css}"/>
+    <link type="text/css" rel="stylesheet" th:href="@{static/css/ddCss/login.css}"/>
+    <link rel="Shortcut Icon" th:href="@{static/img/afvzf-obrwj-001.ico}" type="image/x-icon" />
+</head>
+<body>
+<div class="container theme-showcase">
+    <form th:action="@{/loginSuccess}" method="post" class="form-horizontal">
+        <div class="form-group">
+            <label for="username">User Name</label>
+            <input type="input" class="form-control" th:classappend="${USERNAEM_ISMUST}? 'error' : ''" name="userName" id="username" placeholder="Name">
+        </div>
+        <div class="form-group">
+            <label for="password">User Password</label>
+            <input type="password" class="form-control" th:classappend="${PASSWORD_ISMUST} ? 'error' : ''" name="password" id="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary">Submit</button>
+    </form>
+</div>
+<script type="text/javascript" th:src="@{static/js/jQ/jquery-3.4.1.min.js}"></script>
+<script type="text/javascript" th:src="@{static/plugins/bootstrap-3.3.7-dist/js/bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{static/js/ddJS/index.js}"></script>
+</body>
+</html>
