@@ -1,7 +1,20 @@
 package com.example.mq.MqController;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.util.concurrent.TimeoutException;
+
+import com.example.mq.factory.RabbitMqFactory;
 import com.example.mq.po.MessageTemplate;
 import com.example.mq.po.User;
+import com.example.mq.util.FinalParmarConfig;
+import com.rabbitmq.client.*;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -9,14 +22,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+
 @Controller
 public class MqController {
 
     @Autowired
     private SendMesageClient sendMesageClient;
+    @Autowired
+    private WebScoketController  webScoketController = new WebScoketController();
 
     /**
      * 登陆
+     * 
      * @return html
      */
     @RequestMapping("/login")
@@ -45,10 +62,43 @@ public class MqController {
      * @return html
      */
     @RequestMapping("/receiverMessagePage")
-    public ModelAndView receiverMessagePage(ModelAndView modelAndView) {
+    @ResponseBody
+    public String receiverMessagePage() {
+        // 获取消息
+        ConnectionFactory connectionFactory;
+        MessageTemplate messageTemplate =null;
+        try {
+            connectionFactory = RabbitMqFactory.linkRabbitMq();
+            Connection con = connectionFactory.newConnection();
+            Channel channel = con.createChannel();
+            GetResponse getResponse = channel.basicGet(FinalParmarConfig.MQ_NAME_ONE,false);
+            Envelope envelope = getResponse.getEnvelope();
 
 
-        return modelAndView;
+
+
+
+            if (getResponse != null){
+                messageTemplate = (MessageTemplate) toPlay(getResponse.getBody(), MessageTemplate.class);
+                messageTemplate.setDeliveryTag(String.valueOf(envelope.getDeliveryTag()));
+                webScoketController.onMessage(new JSONObject(messageTemplate).toString());
+            }
+            channel.close();
+            con.close();
+        } catch (KeyManagementException e) {
+            System.out.println(e);
+        } catch (java.security.NoSuchAlgorithmException e) {
+            System.out.println(e);
+        } catch (URISyntaxException e) {
+            System.out.println(e);
+        }catch (IOException e) {
+            System.out.println(e);
+        } catch (TimeoutException e) {
+            System.out.println(e);
+        }catch (Exception e){
+            System.out.println(e);
+        }
+        return "SUCCESS";
     }
 
     /**
@@ -73,6 +123,30 @@ public class MqController {
     @ResponseBody
     public String sendMessage(@ModelAttribute("messageTemplate") MessageTemplate template) {
         return sendMesageClient.sendMessage(template);
+    }
+
+    /*
+     * Title: toPlay
+     * Description:反序列化对象
+     */
+    public static Object toPlay(byte[] bs, Class c) throws Exception {
+        Constructor cl = c.getConstructor();
+        Object readObject = cl.newInstance();
+        //创建存放二进制数据的API
+        ByteArrayInputStream byteArrayInputStream = null;
+        //创建反序列化对象
+        ObjectInputStream objectInputStream = null;
+        try {
+            byteArrayInputStream = new ByteArrayInputStream(bs);
+            objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            //校验测试
+            readObject = objectInputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            objectInputStream.close();
+        }
+        return readObject;
     }
 
 }

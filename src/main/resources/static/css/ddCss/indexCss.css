@@ -83,13 +83,11 @@ body{
 .messageContnet{
     max-height:700px;
 }
-.sendMessageBt{
+.sendMessageBt,.recevierMessageBt{
    display: inline-block;
     height:22px;
     line-height:20px;
     cursor:pointer;
-    position:absolute;
-    right:15px;
 }
 
 .messageValue{

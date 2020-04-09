@@ -64,12 +64,14 @@
         </nav>
     </div>
 </header>
+<!--发布消息-->
 <div class="content">
     <div class="messageBanner">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="panel-title">消息</span>
                 <span class="status"></span>
+                <span class="label label-primary recevierMessageBt">接收消息</span>
                 <span class="label label-primary sendMessageBt">发布消息</span>
             </div>
             <div class="panel-body messageContnet">
@@ -79,7 +81,6 @@
             </div>
         </div>
     </div>
-
 </div>
 </body>
 <script type="text/javascript" th:src="@{static/js/jQ/jquery-3.4.1.min.js}"></script>
@@ -119,18 +120,16 @@
 
     function setMessage(msg) {
         var jsonObject = jQuery.parseJSON(msg);
-        console.log(jsonObject.user);
-        console.log(jsonObject.message);
         var str = "<a href=\"#\" class=\"list-group-item message\">\n" +
             "            <h4 class=\"list-group-item-heading\">" + jsonObject.message + "</h4>\n" +
-            "            <p class=\"list-group-item-text\">" + jsonObject.user + "</p>\n" +
+            "            <p class=\"list-group-item-text\">" + jsonObject.sendUser + "</p>\n" +
+            "            <input type='hidden' class=\"list-group-item-text\" value='" + jsonObject.deliveryTag + "'></input>\n" +
             "        </a>";
-
         $("#receiverDiv").append(str);
     }
 
     jQuery(".sendMessageBt").on("click", function () {
-        $.ajax({
+        jQuery.ajax({
             url: "toSendMessagePage",
             type: "post",
             data: {
@@ -151,19 +150,20 @@
                         }
                     },
                     callback: function (result) {
-                        var user = $("#sendDiv").val();
-                        var message = $("#userDiv2").text();
-                        console.log(user);
+                        var sendUser = jQuery("#sendDiv").val();
+                        var message = jQuery("#userDiv2").text();
+                        var receiverUser = jQuery("#receiverUser").val();
                         if (result) {
-                            $.ajax({
+                            jQuery.ajax({
                                 url: "sendMessage",
                                 type: "post",
                                 data: {
-                                    "message":message,
-                                    "user": user
+                                    "message": message,
+                                    "sendUser": sendUser,
+                                    "receiverUser":receiverUser
                                 },
                                 success: function (responseText) {
-                                    $("#tip").empty().append("<p>" + responseText + "</p>").show(500);
+                                    jQuery("#tip").empty().append("<p>" + responseText + "</p>").show(500);
                                 }
                             })
                         }
@@ -171,6 +171,18 @@
                 });
             }
         })
-    })
+    });
+
+    jQuery(".recevierMessageBt").on("click",function(){
+        jQuery.ajax({
+            url:"receiverMessagePage",
+            async:true,
+            success:function (responseText) {
+                if(!(responseText === "SUCCESS")){
+                    console.log(responseText);
+                }
+            }
+        });
+    });
 </script>
 </html>

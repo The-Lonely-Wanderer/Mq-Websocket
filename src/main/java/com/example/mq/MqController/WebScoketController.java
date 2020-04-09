@@ -1,18 +1,10 @@
 package com.example.mq.MqController;
 
-import com.example.mq.po.User;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.rabbitmq.tools.json.JSONUtil;
-import org.json.JSONObject;
-import org.springframework.boot.jackson.JsonObjectDeserializer;
 import org.springframework.stereotype.Service;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.reflect.Constructor;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -47,12 +39,15 @@ public class WebScoketController {
 
     @OnClose
     public void onClose(Session session) {
-        sessionMap.forEach((id, sessions) -> {
-            if (id.equals(session.getId())) {
-                sessionMap.remove(id);
-            }
-        });
+        //用户断开连接时移除当前用户的session
+        //获取用户Map的值
+        Collection<CopyOnWriteArraySet<Session>> sessionCollection = sessionMap.values();
+        for (CopyOnWriteArraySet<Session> sessionCopyOnWriteArraySet : sessionCollection) {
+            sessionCopyOnWriteArraySet.forEach(session1 -> {
+                if (session1.equals(session)){
+                    sessionMap.remove(session);
+                }
+            });
+        }
     }
-
-
 }

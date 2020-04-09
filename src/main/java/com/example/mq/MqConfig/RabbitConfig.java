@@ -23,10 +23,10 @@ public class RabbitConfig {
     /**
      * 配置消息队列
      * */
-    @Bean
-    public Queue Queue1(){
+    //@Bean
+    /*public Queue Queue1(){
         return new Queue(FinalParmarConfig.MQ_NAME_ONE);
-    }
+    }*/
 
    /**
      * 直连交换机 绑定 直连交消息队队列
@@ -34,10 +34,10 @@ public class RabbitConfig {
      * @param directExchange
      * @return
      */
-    @Bean
+    /*@Bean
     public Binding bindingDireceExchange(Queue Queue1,DirectExchange directExchange){
         return BindingBuilder.bind(Queue1).to(directExchange).with(FinalParmarConfig.ROUTINGKEY_ONE);
-    }
+    }*/
 
 
     /**
